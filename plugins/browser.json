@@ -37,7 +37,17 @@
         },
         "cordova-launch-review": {
             "PACKAGE_NAME": "com.sinopacific.gpstrackingwa"
+        },
+        "cordova-plugin-advanced-http": {
+            "PACKAGE_NAME": "com.sinopacific.gpstrackingwa"
+        },
+        "cordova-custom-config": {
+            "PACKAGE_NAME": "com.sinopacific.gpstrackingwa"
         }
     },
-    "dependent_plugins": {}
+    "dependent_plugins": {
+        "cordova-plugin-file": {
+            "PACKAGE_NAME": "com.sinopacific.gpstrackingwa"
+        }
+    }
 }

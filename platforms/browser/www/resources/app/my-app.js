@@ -69,6 +69,9 @@ if( navigator.userAgent.match(/Windows/i) ){
 document.addEventListener("deviceready", onDeviceReady, false ); 
 
 function onDeviceReady(){ 
+    if (cordova && cordova.InAppBrowser) {
+        window.open = cordova.InAppBrowser.open;
+    }
     AppDetails.appId = BuildInfo.packageName;
 
     //fix app images and text size
@@ -520,8 +523,52 @@ var virtualAssetList = App.virtualList('.assets_list', {
 
 $$('.login-form').on('submit', function (e) {    
 	e.preventDefault();	
+	console.log('start');
+	/*
+	onJsonP = function(arg) {
+        alert(arg);
+    }*/
+    /*
+    $.ajax({
+               type: "GET",
+                dataType: "json", 
+                dataFilter: function(raw, type) {
+                console.log(raw, type);
+                return JSON.parse(raw);
+            },
+              jsonp: false,
+              //jsonpCallback: "onJsonP",
+                url: 'http://192.168.1.1/livesubstream.h264',
+              async: true,           
+                crossDomain: true, 
+              cache: false,
+            success: function (result) {    
+                console.log(result);
+            },
+            error: function(XMLHttpRequest, textStatus, errorThrown){ 
+               console.log(textStatus,'error');
+            }
+        });*/
+		window.plugins.html5Video.initialize({
+			  "streamka" : "http://192.168.1.1/livesubstream.h264"
+		  }, function initializeIsFinished() {
+			  alert('okokokoko');
+		  window.plugins.html5Video.play("streamka")
+		})
+		
+	/*
+	let url = 'http://192.168.1.1/livesubstream.h264';//http://192.168.1.1/ini.htm?cmd=commonvideolist
+	let params = {};
+	let headers = {};
+	cordova.plugin.http.get(url, 
+		params, headers, (response) => {
+	  //console.log(response);
+	}, function(response) {
+	  console.error(response.error);
+	});*/
+         console.log('end');
     //login();
-    preLogin(); 
+    //preLogin(); 
     return false;
 });
 
@@ -579,11 +626,12 @@ $$('body').on('click', 'a.external', function(event) {
     event.preventDefault();
     var href = this.getAttribute('href');
     if (href) {
-        if (typeof navigator !== "undefined" && navigator.app) {                
+        /*if (typeof navigator !== "undefined" && navigator.app) {                
             navigator.app.loadUrl(href, {openExternal: true}); 
         } else {
             window.open(href,'_blank');
-        }
+        }*/
+        window.open(encodeURI(href), '_blank', 'location=yes');
     }
     return false;
 });
@@ -601,11 +649,12 @@ $$('body').on('click', '.routeButton', function(){
             encodeURIComponent(lng)
             ); 
         
-        if (typeof navigator !== "undefined" && navigator.app) {                
+        /*if (typeof navigator !== "undefined" && navigator.app) {                
             navigator.app.loadUrl(href, {openExternal: true}); 
         } else {
             window.open(href,'_blank');
-        }
+        }*/
+        window.open(href, '_blank', 'location=yes');
     }
     
 });
@@ -1074,8 +1123,7 @@ App.onPageInit('asset.status', function (page) {
     }          
     
     $$('.buttonAssetEdit').on('click', function(){
-
-         
+		
         var assetList = getAssetList();  
         var asset = assetList[TargetAsset.ASSET_IMEI]; 
         var AssetImg = 'resources/images/svg_default_asset_photo.svg';
@@ -2704,6 +2752,8 @@ function reGetPushDetails(){
 }
 
 function login(){ 
+
+
     //alert('login() called');   
     getPlusInfo();
     //hideKeyboard();
@@ -3011,11 +3061,12 @@ function loadAlarmsAssetsPage(){
 
 function loadPageUserGuide(){
     var href = API_URL.URL_USERGUIDE;
-    if (typeof navigator !== "undefined" && navigator.app) {        
+    /*if (typeof navigator !== "undefined" && navigator.app) {        
         navigator.app.loadUrl(href, {openExternal: true});           
     } else {
         window.open(href,'_blank');
-    }
+    }*/
+    window.open(href, '_blank', 'location=yes');
 }
 
 function loadReportsPage(){
@@ -3096,12 +3147,13 @@ function loadPageTheftReport(){
      
     var href = API_URL.URL_REPORT_THEFT.format(param.loginName,param.imei,param.make,param.model,param.rego); 
     
-    if (typeof navigator !== "undefined" && navigator.app) {
+    /*if (typeof navigator !== "undefined" && navigator.app) {
         //plus.runtime.openURL(href); 
         navigator.app.loadUrl(href, {openExternal: true});           
     } else {
         window.open(href,'_blank');
-    }
+    }*/
+    window.open(href, '_blank', 'location=yes');
 }
 
 function loadPageSupport(){
@@ -3140,11 +3192,12 @@ function loadPageSupport(){
   
     var href = API_URL.URL_SUPPORT.format(param.name,param.loginName,param.email,param.phone,param.service); 
     
-    if (typeof navigator !== "undefined" && navigator.app) {                
+    /*if (typeof navigator !== "undefined" && navigator.app) {                
             navigator.app.loadUrl(href, {openExternal: true}); 
         } else {
             window.open(href,'_blank');
-        }
+        }*/
+        window.open(href, '_blank', 'location=yes');
 }
 
 function loadResetPwdPage(){
@@ -4723,8 +4776,8 @@ function updateAssetList(asset){
     POSINFOASSETLIST[asset.IMEI].Name = list[asset.IMEI].Name = asset.Name;
     POSINFOASSETLIST[asset.IMEI].TagName = list[asset.IMEI].TagName = asset.Tag;
     POSINFOASSETLIST[asset.IMEI].Unit = list[asset.IMEI].Unit = asset.Unit;
-    POSINFOASSETLIST[asset.IMEI].Mileage = list[asset.IMEI].Mileage = asset.Mileage;
-    POSINFOASSETLIST[asset.IMEI].Runtime = list[asset.IMEI].Runtime = asset.Runtime;
+    POSINFOASSETLIST[asset.IMEI].InitMileage = list[asset.IMEI].InitMileage = asset.Mileage;
+    POSINFOASSETLIST[asset.IMEI].InitAcconHours = list[asset.IMEI].InitAcconHours = asset.Runtime;
     POSINFOASSETLIST[asset.IMEI].Describe1 = list[asset.IMEI].Describe1 = asset.Describe1;
     POSINFOASSETLIST[asset.IMEI].Describe2 = list[asset.IMEI].Describe2 = asset.Describe2;
     POSINFOASSETLIST[asset.IMEI].Describe3 = list[asset.IMEI].Describe3 = asset.Describe3;
