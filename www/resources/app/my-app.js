@@ -332,7 +332,7 @@ API_URL.URL_SET_DOOR = API_DOMIAN4 + "asset/door?MajorToken={0}&MinorToken={1}&c
 API_URL.URL_ROUTE = "maps://maps.apple.com/maps?daddr={0},{1}"; // ios link
 API_URL.URL_REFRESH_TOKEN = API_DOMIAN1 + "User/RefreshToken";
 
-API_URL.URL_USERGUIDE = "https://quiktrakglobal.com/pdf/qt-app.pdf";
+API_URL.URL_USERGUIDE = "https:/helper.quiktrak.com.au/manuals/gps-tracking-wa/app-user-manual.pdf";
 
 var cameraButtons = [
     {
@@ -523,52 +523,8 @@ var virtualAssetList = App.virtualList('.assets_list', {
 
 $$('.login-form').on('submit', function (e) {    
 	e.preventDefault();	
-	console.log('start');
-	/*
-	onJsonP = function(arg) {
-        alert(arg);
-    }*/
-    /*
-    $.ajax({
-               type: "GET",
-                dataType: "json", 
-                dataFilter: function(raw, type) {
-                console.log(raw, type);
-                return JSON.parse(raw);
-            },
-              jsonp: false,
-              //jsonpCallback: "onJsonP",
-                url: 'http://192.168.1.1/livesubstream.h264',
-              async: true,           
-                crossDomain: true, 
-              cache: false,
-            success: function (result) {    
-                console.log(result);
-            },
-            error: function(XMLHttpRequest, textStatus, errorThrown){ 
-               console.log(textStatus,'error');
-            }
-        });*/
-		window.plugins.html5Video.initialize({
-			  "streamka" : "http://192.168.1.1/livesubstream.h264"
-		  }, function initializeIsFinished() {
-			  alert('okokokoko');
-		  window.plugins.html5Video.play("streamka")
-		})
-		
-	/*
-	let url = 'http://192.168.1.1/livesubstream.h264';//http://192.168.1.1/ini.htm?cmd=commonvideolist
-	let params = {};
-	let headers = {};
-	cordova.plugin.http.get(url, 
-		params, headers, (response) => {
-	  //console.log(response);
-	}, function(response) {
-	  console.error(response.error);
-	});*/
-         console.log('end');
     //login();
-    //preLogin(); 
+    preLogin(); 
     return false;
 });
 
@@ -1123,7 +1079,8 @@ App.onPageInit('asset.status', function (page) {
     }          
     
     $$('.buttonAssetEdit').on('click', function(){
-		
+
+         
         var assetList = getAssetList();  
         var asset = assetList[TargetAsset.ASSET_IMEI]; 
         var AssetImg = 'resources/images/svg_default_asset_photo.svg';
@@ -2752,8 +2709,6 @@ function reGetPushDetails(){
 }
 
 function login(){ 
-
-
     //alert('login() called');   
     getPlusInfo();
     //hideKeyboard();
