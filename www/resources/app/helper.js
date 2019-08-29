@@ -24,6 +24,11 @@ Protocol = {
             popupAnchor:  [0, -60] // point from which the popup should open relative to the iconAnchor
         })
     ],
+    PolygonCustomization:{
+        color: '#AA5959',
+        fillColor: '#FF0000',
+        fillOpacity: 0.25,
+    },
     PositionTypes: {
         "NONE": 0,
         "GPS": 1,
@@ -121,6 +126,43 @@ Protocol = {
         "Immobilise": 2,
         "LockDoor": 4,
     },
+    DaysOfWeek: [
+        {
+            val: 0,
+            name: LANGUAGE.GEOFENCE_MSG_20,
+            nameSmall: LANGUAGE.COM_MSG46,
+        },
+        {
+            val: 1,
+            name: LANGUAGE.GEOFENCE_MSG_21,
+            nameSmall: LANGUAGE.COM_MSG47,
+        },
+        {
+            val: 2,
+            name: LANGUAGE.GEOFENCE_MSG_22,
+            nameSmall: LANGUAGE.COM_MSG48,
+        },
+        {
+            val: 3,
+            name: LANGUAGE.GEOFENCE_MSG_23,
+            nameSmall: LANGUAGE.COM_MSG49,
+        },
+        {
+            val: 4,
+            name: LANGUAGE.GEOFENCE_MSG_24,
+            nameSmall: LANGUAGE.COM_MSG50,
+        },
+        {
+            val: 5,
+            name: LANGUAGE.GEOFENCE_MSG_25,
+            nameSmall: LANGUAGE.COM_MSG51,
+        },
+        {
+            val: 6,
+            name: LANGUAGE.GEOFENCE_MSG_26,
+            nameSmall: LANGUAGE.COM_MSG52,
+        },
+    ],
     Helper: {
         getSpeedValue: function (speedUnit, speed) {
             var ret = 0;
@@ -246,6 +288,7 @@ Protocol = {
         },
         getPositionType: function(type){
             var ret = "";
+            type ? type = parseInt(type,10) : '';
             switch (type){
                 case 0: case 1:
                     ret = "GPS";
@@ -271,6 +314,19 @@ Protocol = {
             }
             return ret;
            
+        },
+        getAlertNameByType: function(type){
+            var ret = "";
+            type ? type = parseInt(type,10) : '';
+            switch (type){ 
+                case 8:
+                    ret = LANGUAGE.ALARM_MSG12;    //InGeoFance
+                    break;
+                case 16:
+                    ret = LANGUAGE.ALARM_MSG13;     //OutGeoFance
+                    break;                    
+            }
+            return ret;  
         },
         getDifferenceBTtwoDates: function(date1, date2){
             var ret = "";
@@ -303,6 +359,23 @@ Protocol = {
                 }
             }            
             return ret;
+        },
+        getGeofenceAlertType: function(val){
+            var ret = '';
+            if (val) {
+                if ((parseInt(val) & 8) > 0) {        
+                    ret += LANGUAGE.GEOFENCE_MSG_12 + ', '; 
+                }
+                if ((parseInt(val) & 16) > 0) {        
+                    ret += LANGUAGE.GEOFENCE_MSG_13 + ', '; 
+                }                
+            } 
+            if (ret) {
+                ret = ret.slice(0, -2);
+            }else{
+                ret = LANGUAGE.COM_MSG58; 
+            }
+            return ret; 
         },
         getAddressByGeocoder: function(latlng,replyFunc){
             /*var url = "http://map.quiktrak.co/reverse.php?format=json&lat={0}&lon={1}&zoom=18&addressdetails=1".format(latlng.lat, latlng.lng);
@@ -396,17 +469,17 @@ Protocol = {
         },    
         createMap: function(option){
             var osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { name: 'osm', attribution: '' });            
-            var googleStreets = L.tileLayer('http://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}',{
+            var googleStreets = L.tileLayer('https://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}',{
                 maxZoom: 22,
                 subdomains:['mt0','mt1','mt2','mt3']
             });           
-            var googleSatelitte = L.tileLayer('http://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}',{
+            var googleSatelitte = L.tileLayer('https://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}',{
                 maxZoom: 20,
                 subdomains:['mt0','mt1','mt2','mt3']
             });  
          
 
-            var map = L.map(option.target, { zoomControl: false, center: option.latLng, zoom: option.zoom, layers: [googleStreets] }); 
+            var map = L.map(option.target, { zoomControl: false, center: option.latLng, zoom: option.zoom, fullscreenControl: true, layers: [googleStreets] }); 
                         
             var layers = {
                 "<span class='mapSwitcherWrapper googleSwitcherWrapper'><img class='layer-icon' src='resources/images/googleRoad.png' alt='' /> <p>Map</p></span>": googleStreets,
@@ -499,7 +572,7 @@ Protocol = {
                         if(typeof asset.posInfo.alt == "undefined"){
                             ret.temperature.value = LANGUAGE.COM_MSG11;
                         }else{
-                            ret.temperature.value = asset.posInfo.alt + '&nbsp;°C'; 
+                            ret.temperature.value = Math.round(asset.posInfo.alt*10)/10 + '&nbsp;°C'; 
                         }                   
                     }
                     if(asset.haveFeature("FuelSensor")){
@@ -513,11 +586,19 @@ Protocol = {
                     if(asset.haveFeature("Voltage")){
                         ret.voltage = {};
                         //console.log(asset.posInfo.alt);
-                        if(typeof asset.posInfo.alt == "undefined"){
+                        /*if(typeof asset.posInfo.alt == "undefined"){
                             ret.voltage.value = LANGUAGE.COM_MSG11;
                         }else{                            
                             ret.voltage.value = (asset.posInfo.alt > 50? LANGUAGE.COM_MSG11 : ""+ Math.round(asset.posInfo.alt*10)/10 + '&nbsp;V');
-                        }                         
+                        }    */    
+
+                        ret.voltage.value = LANGUAGE.COM_MSG11;
+                        if(asset.posInfo.Voltage){
+                            ret.voltage.value =  Math.round(asset.posInfo.Voltage*10)/10 + '&nbsp;V';
+                        }
+                        else{
+                            ret.voltage.value = (asset.posInfo.alt > 50? LANGUAGE.COM_MSG11 : ""+ Math.round(asset.posInfo.alt*10)/10 + '&nbsp;V');
+                        }                 
                     } 
                     if(asset.haveFeature("Mileage")) {                    
                         ret.mileage = {};
@@ -775,7 +856,15 @@ Protocol.Common = JClass({
         this.AlarmOptions = arg.AlarmOptions;
         this._FIELD_FLOAT8 = arg._FIELD_FLOAT8;
         this.StatusNew = arg.StatusNew;    
-        this._FIELD_INT2 = arg._FIELD_INT2;   
+        this._FIELD_INT2 = arg._FIELD_INT2;
+        this.GroupCode = arg.GroupCode;   
+        this.SolutionType = arg.SolutionType;
+        this.Registration = arg.Registration;
+        this.StockNumber = arg.StockNumber;
+        this.MaxSpeed = arg.MaxSpeed;
+        this.MaxSpeedAlertMode = arg.MaxSpeedAlertMode;
+
+        
     
     },
     initDeviceInfoEx:function(){},
